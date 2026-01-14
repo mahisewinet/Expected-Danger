@@ -242,16 +242,9 @@ def main():
     )
 
     # ===============================
-    # PATHS (GitHub-friendly)
-    # ===============================
-    DATA_PATH = "data/statsbomb_wc2022"
-    MATCHES_PATH = os.path.join(DATA_PATH, "matches", "wc2022_matches.json")
-    EVENTS_DIR = os.path.join(DATA_PATH, "events")
-
-    # ===============================
     # LOAD DATA
     # ===============================
-    df_matches = load_matches(MATCHES_PATH)
+    df_matches = load_matches()
     df_events_clean = build_clean_events(df_matches, EVENTS_DIR)
 
     # ===============================
@@ -312,6 +305,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
