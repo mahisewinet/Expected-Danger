@@ -249,7 +249,7 @@ def main():
     # ===============================
     # BUILD PER-90 DATASET
     # ===============================
-    df_per90 = build_player_per90(df_events_clean)
+    df_per90 = build_per90(df_events_clean)
     df_players = get_player_lookup(df_events_clean)
     df_per90_named = df_per90.merge(df_players, on="player_id", how="left")
 
@@ -304,6 +304,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
