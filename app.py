@@ -31,6 +31,24 @@ FINAL_THIRD_X = 80
 def load_matches():
     with open(MATCHES_PATH, "r", encoding="utf-8") as f:
         return pd.DataFrame(json.load(f))
+        
+def find_match_id(df_matches, team1, team2):
+    match = df_matches[
+        (
+            df_matches.home_team.apply(lambda x: x["home_team_name"] == team1) &
+            df_matches.away_team.apply(lambda x: x["away_team_name"] == team2)
+        ) |
+        (
+            df_matches.home_team.apply(lambda x: x["home_team_name"] == team2) &
+            df_matches.away_team.apply(lambda x: x["away_team_name"] == team1)
+        )
+    ]
+
+    if match.empty:
+        st.error(f"No match found for {team1} vs {team2}")
+        st.stop()
+
+    return int(match.iloc[0]["match_id"])
 
 
 def build_clean_events(df_matches):
@@ -312,6 +330,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
