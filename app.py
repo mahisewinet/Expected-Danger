@@ -231,71 +231,89 @@ def plot_messi_comparison(df, messi_id):
 # APP
 # ===============================
 def main():
-    st.title("Lionel Messi – Attacking Influence (World Cup 2022)")
 
-    df_matches = load_matches()
-    df_events = build_clean_events(df_matches)
-    df_per90 = build_per90(df_events)
-
-    players = df_events[["player_id", "player_name"]].drop_duplicates()
-    df_per90 = df_per90.merge(players, on="player_id", how="left")
-
-    # -----------------------
-    # SIDEBAR CONTROLS
-    # -----------------------
-    st.sidebar.header("Controls")
-
-    arg_matches = df_matches[
-        df_matches.home_team.apply(lambda x: x["home_team_name"] == "Argentina") |
-        df_matches.away_team.apply(lambda x: x["away_team_name"] == "Argentina")
-    ].copy()
-
-    arg_matches["label"] = (
-        arg_matches.home_team.apply(lambda x: x["home_team_name"]) +
-        " vs " +
-        arg_matches.away_team.apply(lambda x: x["away_team_name"])
+    st.set_page_config(
+        page_title="Messi World Cup 2022 Analysis",
+        layout="wide"
     )
 
-    selected_match = st.sidebar.selectbox(
-        "Select Argentina match",
-        options=arg_matches.match_id,
-        format_func=lambda x: arg_matches[arg_matches.match_id == x]["label"].iloc[0]
+    st.title("Lionel Messi – Attacking Impact at the 2022 World Cup")
+    st.markdown(
+        "This app analyses Lionel Messi’s **final-third creativity** and "
+        "**attacking output** using open-play event data from the 2022 FIFA World Cup."
     )
 
-    players_in_match = df_events[df_events.match_id == selected_match][["player_id", "player_name"]].drop_duplicates()
-    player_dict = dict(zip(players_in_match.player_id, players_in_match.player_name))
+    # ===============================
+    # PATHS (GitHub-friendly)
+    # ===============================
+    DATA_PATH = "data/statsbomb_wc2022"
+    MATCHES_PATH = os.path.join(DATA_PATH, "matches", "wc2022_matches.json")
+    EVENTS_DIR = os.path.join(DATA_PATH, "events")
 
-    selected_player = st.sidebar.selectbox(
-        "Select player",
-        options=player_dict.keys(),
-        index=list(player_dict.keys()).index(MESSI_ID),
-        format_func=lambda x: player_dict[x]
+    # ===============================
+    # LOAD DATA
+    # ===============================
+    df_matches = load_matches(MATCHES_PATH)
+    df_events_clean = build_clean_events(df_matches, EVENTS_DIR)
+
+    # ===============================
+    # BUILD PER-90 DATASET
+    # ===============================
+    df_per90 = build_player_per90_dataset(df_events_clean)
+    df_players = get_player_lookup(df_events_clean)
+    df_per90_named = df_per90.merge(df_players, on="player_id", how="left")
+
+    # ===============================
+    # CONSTANTS
+    # ===============================
+    MESSI_NAME = "Lionel Andrés Messi Cuccittini"
+    MESSI_ID = 5503
+    FINAL_THIRD_X = 80
+
+    # ===============================
+    # SIDEBAR — MATCH SELECTION
+    # ===============================
+    st.sidebar.header("Match selection")
+
+    match_options = {
+        "Argentina vs Saudi Arabia": ("Argentina", "Saudi Arabia"),
+        "Argentina vs Mexico": ("Argentina", "Mexico")
+    }
+
+    selected_match_label = st.sidebar.selectbox(
+        "Select match",
+        options=list(match_options.keys())
     )
 
-    # -----------------------
-    # PASS MAP
-    # -----------------------
-    df_passes = df_events[
-        (df_events.match_id == selected_match) &
-        (df_events.player_id == selected_player) &
-        (df_events.event_type == "Pass") &
-        (df_events.x >= FINAL_THIRD_X)
+    team1, team2 = match_options[selected_match_label]
+    match_id = find_match_id(df_matches, team1, team2)
+
+    # ===============================
+    # FILTER MESSI PASSES (MATCH-SPECIFIC)
+    # ===============================
+    df_messi_match = df_events_clean[
+        (df_events_clean["match_id"] == match_id) &
+        (df_events_clean["player_name"] == MESSI_NAME) &
+        (df_events_clean["event_type"] == "Pass") &
+        (df_events_clean["x"] >= FINAL_THIRD_X)
     ].dropna(subset=["x", "y", "end_x", "end_y"])
 
+    # ===============================
+    # VISUALISATIONS
+    # ===============================
+    st.subheader("Final-Third Open-Play Passing")
+
     draw_final_third_pass_map(
-        df_passes,
-        f"{player_dict[selected_player]} – Final-third Open-play Passes"
+        df_messi_match,
+        f"Lionel Messi – Final-Third Open-Play Passes\n{selected_match_label} (World Cup 2022)"
     )
 
-    st.divider()
+    st.subheader("Messi vs Comparable Attackers (Tournament Context)")
 
-    # -----------------------
-    # COMPARISON
-    # -----------------------
-    plot_messi_comparison(df_per90, MESSI_ID)
-
+    plot_messi_comparison_per90(df_per90_named, MESSI_ID)
 
 if __name__ == "__main__":
     main()
+
 
 
