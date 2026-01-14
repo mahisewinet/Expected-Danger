@@ -119,6 +119,14 @@ def draw_final_third_pass_map(df_passes, title):
     st.pyplot(fig)
     plt.close(fig)
 
+def get_player_lookup(df):
+    return (
+        df[["player_id", "player_name"]]
+        .dropna()
+        .drop_duplicates()
+        .reset_index(drop=True)
+    )
+
 
 def plot_messi_comparison(df, messi_id):
 
@@ -300,10 +308,11 @@ def main():
 
     st.subheader("Messi vs Comparable Attackers (Tournament Context)")
 
-    plot_messi_comparison_per90(df_per90_named, MESSI_ID)
+    plot_messi_comparison(df_per90_named, MESSI_ID)
 
 if __name__ == "__main__":
     main()
+
 
 
 
