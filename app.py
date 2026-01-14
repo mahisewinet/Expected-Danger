@@ -124,21 +124,107 @@ def draw_final_third_pass_map(df_passes, title):
 
 
 def plot_messi_comparison(df, messi_id):
-    fig, ax = plt.subplots(figsize=(10, 7))
 
-    ax.scatter(df.final_third_passes_per90, df.xg_per90,
-               alpha=0.7, edgecolors="black")
+    fig, ax = plt.subplots(figsize=(12, 8))
 
-    messi = df[df.player_id == messi_id]
-    ax.scatter(messi.final_third_passes_per90, messi.xg_per90,
-               s=300, marker="*", color="gold", edgecolors="black")
+    # Scatter all players
+    ax.scatter(
+        df["final_third_passes_per90"],
+        df["xg_per90"],
+        s=90,
+        alpha=0.7,
+        color="steelblue",
+        edgecolors="black",
+        linewidth=0.5,
+        label="Other players"
+    )
 
-    ax.set_xlabel("Final-third passes per 90")
-    ax.set_ylabel("xG per 90")
-    ax.set_title("Messi vs Attacking Players – World Cup 2022")
+    # Highlight Messi
+    messi = df[df["player_id"] == messi_id]
 
+    if not messi.empty:
+        ax.scatter(
+            messi["final_third_passes_per90"],
+            messi["xg_per90"],
+            s=350,
+            marker="*",
+            color="gold",
+            edgecolors="black",
+            linewidth=2,
+            label="Lionel Messi",
+            zorder=10
+        )
+
+        ax.annotate(
+            "MESSI",
+            (
+                messi["final_third_passes_per90"].iloc[0],
+                messi["xg_per90"].iloc[0]
+            ),
+            xytext=(12, 12),
+            textcoords="offset points",
+            fontsize=13,
+            fontweight="bold",
+            color="darkred",
+            bbox=dict(
+                boxstyle="round,pad=0.3",
+                facecolor="gold",
+                alpha=0.8
+            )
+        )
+
+    # Annotate top 5 xG players (excluding Messi)
+    df_others = df[df["player_id"] != messi_id]
+    top_xg_players = df_others.nlargest(5, "xg_per90")
+
+    for _, row in top_xg_players.iterrows():
+        ax.annotate(
+            row["player_name"],
+            (row["final_third_passes_per90"], row["xg_per90"]),
+            xytext=(5, 5),
+            textcoords="offset points",
+            fontsize=9,
+            alpha=0.8
+        )
+
+    # Axis labels
+    ax.set_xlabel("Final-Third Passes per 90", fontsize=12, fontweight="bold")
+    ax.set_ylabel("Expected Goals (xG) per 90", fontsize=12, fontweight="bold")
+
+    # Title
+    ax.set_title(
+        "Messi vs Comparable Attackers\n"
+        "World Cup 2022 — Final-Third Creativity vs Goal Threat (per 90)",
+        fontsize=14,
+        fontweight="bold",
+        pad=20
+    )
+
+    # Grid
+    ax.grid(True, linestyle="--", alpha=0.3)
+
+    # Reference lines (dataset averages)
+    ax.axhline(
+        y=df["xg_per90"].mean(),
+        color="gray",
+        linestyle=":",
+        alpha=0.6
+    )
+
+    ax.axvline(
+        x=df["final_third_passes_per90"].mean(),
+        color="gray",
+        linestyle=":",
+        alpha=0.6
+    )
+
+    # Legend
+    ax.legend(loc="upper left")
+
+    # Streamlit render
     st.pyplot(fig)
     plt.close(fig)
+
 
 
 # ===============================
@@ -211,4 +297,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
