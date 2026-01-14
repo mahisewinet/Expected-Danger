@@ -75,7 +75,6 @@ def build_clean_events(df_matches):
     return pd.DataFrame(event_rows)
 
 
-@st.cache_data(show_spinner=True)
 def build_per90(df):
     minutes = (
         df.dropna(subset=["player_id", "minute"])
@@ -245,7 +244,7 @@ def main():
     # LOAD DATA
     # ===============================
     df_matches = load_matches()
-    df_events_clean = build_clean_events(df_matches, EVENTS_DIR)
+    df_events_clean = build_clean_events(df_matches)
 
     # ===============================
     # BUILD PER-90 DATASET
@@ -305,6 +304,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
