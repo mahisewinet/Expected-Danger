@@ -28,13 +28,11 @@ FINAL_THIRD_X = 80
 # ===============================
 # DATA LOADING (CACHED)
 # ===============================
-@st.cache_data(show_spinner=True)
 def load_matches():
     with open(MATCHES_PATH, "r", encoding="utf-8") as f:
         return pd.DataFrame(json.load(f))
 
 
-@st.cache_data(show_spinner=True)
 def build_clean_events(df_matches):
     OPEN_PLAY_EXCLUDE = ["Corner", "Free Kick", "Throw-in", "Kick Off"]
     event_rows = []
@@ -314,6 +312,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
