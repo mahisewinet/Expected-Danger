@@ -31,7 +31,8 @@ FINAL_THIRD_X = 80
 def load_matches():
     with open(MATCHES_PATH, "r", encoding="utf-8") as f:
         return pd.DataFrame(json.load(f))
-        def find_match_id(df_matches, team1, team2):
+        
+def find_match_id(df_matches, team1, team2):
     match = df_matches[
         (
             df_matches["home_team"].apply(
@@ -338,6 +339,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
