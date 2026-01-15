@@ -264,11 +264,6 @@ def plot_messi_comparison(df, messi_id):
 # ===============================
 def main():
 
-    st.set_page_config(
-        page_title="Messi World Cup 2022 Analysis",
-        layout="wide"
-    )
-
     st.title("Lionel Messi – Attacking Impact at the 2022 World Cup")
     st.markdown(
         "This app analyses Lionel Messi’s **final-third creativity** and "
@@ -339,6 +334,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
