@@ -130,7 +130,7 @@ def build_per90(df):
 # ===============================
 def draw_final_third_pass_map(df_passes, title):
     pitch = Pitch(pitch_type="statsbomb", half=True)
-    fig, ax = pitch.draw(figsize=(9, 6))
+    fig, ax = pitch.draw(figsize=(6.5, 4))
 
     ax.add_patch(Rectangle((FINAL_THIRD_X, 0), 120 - FINAL_THIRD_X, 80,
                            facecolor="yellow", alpha=0.25))
@@ -334,6 +334,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
