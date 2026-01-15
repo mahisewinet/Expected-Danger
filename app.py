@@ -15,6 +15,7 @@ from tqdm import tqdm
 # ===============================
 st.set_page_config(
     page_title="Messi World Cup 2022 Analysis",
+    page_icon="⚽",
 )
 
 DATA_PATH = "data/statsbomb_wc2022"
@@ -334,6 +335,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
